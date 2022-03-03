@@ -1,3 +1,5 @@
+import streamlit as st
+from PIL import Image
 import hashlib
 import re
 
@@ -93,10 +95,5 @@ if choice1=="Signup":
             else:
                 st.warning("Not Valid Mobile Number")
         else:
-            st.warning("Password Does not Match")
-            
-            
-            
-            
-            
-            
+            st.warning("Password Does not Match")     
+     
