@@ -31,15 +31,15 @@ def login_user(Email,password):
 
 
 # title
-st.title('Skin-Cancer Classfication App')
+image=Image.open('Home.png')
+st.image(image)
 menu1 = ["Home","Login", "Signup"]
 choice1 = st.sidebar.selectbox("menu",menu1)
 if choice1=="Home":
     #html
-    testp="<p style='text-align: center;'>Skin cancer is the most common and prevalent type of cancer over the world. More precise analysis needs to be performed to identify the category of the skin lesion because skin lesions look quite similar to each other. Early screening and detection of skin cancer is the most hopeful sign of making a full recovery. Our Aim to make a system that detect types of skin cancer along with stages of cancer as fast as possible for effective treatment, which cause in increasing the survival rate from Skin cancer</p>"
+    testp="<p style='font-size: 17px;text-align:center;font-family:verdana;text-align: justify'>Skin cancer is the most common and prevalent type of cancer over the world. More precise analysis needs to be performed to identify the category of the skin lesion because skin lesions look quite similar to each other. Early screening and detection of skin cancer is the most hopeful sign of making a full recovery. Our Aim to make a system that detect types of skin cancer along with stages of cancer as fast as possible for effective treatment, which cause in increasing the survival rate from Skin cancer</p>"
     st.markdown(testp,unsafe_allow_html=True)
-    image=Image.open('sc.jpg')
-    st.image(image)
+
 if choice1=="Login":
     st.subheader("Login Section")
     Email=st.sidebar.text_input('Email')
@@ -95,5 +95,10 @@ if choice1=="Signup":
             else:
                 st.warning("Not Valid Mobile Number")
         else:
-            st.warning("Password Does not Match")     
-     
+            st.warning("Password Does not Match")
+            
+            
+            
+            
+            
+            
