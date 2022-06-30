@@ -2,7 +2,7 @@ import streamlit as st
 from PIL import Image
 import hashlib
 import re
-import cv2
+from .cv2 import *
 import numpy as np
 
 def make_hashes(password):   
