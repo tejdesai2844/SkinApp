@@ -1,5 +1,4 @@
 numpy
-streamlit
 pillow
 scikit-learn
 opencv-python
