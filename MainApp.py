@@ -2,6 +2,8 @@ import streamlit as st
 from PIL import Image
 import hashlib
 import re
+import cv2
+import numpy as np
 
 def make_hashes(password):   
     return hashlib.sha256(str.encode(password)).hexdigest()
@@ -26,9 +28,6 @@ def login_user(Email,password):
     c.execute('SELECT * FROM userstable WHERE Email =? AND password = ?',(Email,password))
     data = c.fetchall()
     return data
-
-
-
 
 # title
 image=Image.open('Home.png')
@@ -55,18 +54,64 @@ if choice1=="Login":
             if result:
                 imgur=st.file_uploader("Browse Skin Image")
                 image=Image.open(imgur)
-                st.image(image)
+                image.save("original.jpg")
                 menu2 = ["Gaussian Filter","Average Filter", "Median Filter"]
-                choice2 = st.selectbox("Select Filter",menu2)
+                choice2 = st.selectbox("Select Filter",menu2)           
                 menu3 = ["Color","Texture", "Hybrid"]
                 choice3 = st.selectbox("Select Feature",menu3)
-                menu4 = ["SVM (Support Vector Machine)","KNN (K-Nearest Neighbour)", "RF (Random Forest)","DT (Decision Tree)"]
+                menu4 = ["K-Nearest Neighbors", "Liner SVM",
+                         "Decision Tree", "Random Forest",
+                         "Naive Bayes","ExtraTreesClassifier"]
                 choice4 = st.selectbox("Select Method",menu4)
+                img=cv2.imread("original.jpg")
+                img=cv2.resize(img,(512,512), interpolation = cv2.INTER_AREA)
                 b2=st.button("Predict")
                 if b2:
-                   st.success("The Skin Cancer Type is= ")
+                    if choice2=="Median Filter":
+                        gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                        ft1 = cv2.medianBlur(gray, 3)
+                        ret, bw = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+                        cv2.imwrite('filter.jpg', ft1)
+                        cv2.imwrite('segmented.jpg', bw) 
+                    if choice2=="Gaussian Filter":
+                        gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                        ft1 =cv2.GaussianBlur(gray,(5,5),0)
+                        ret, bw = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+                        cv2.imwrite('filter.jpg', ft1)
+                        cv2.imwrite('segmented.jpg', bw) 
+                    if choice2=="Average Filter":
+                        gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                        kernel = np.ones((5,5),np.float32)/25
+                        ft1 = cv2.filter2D(gray,-1,kernel)
+                        ret, bw = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+                        cv2.imwrite('filter.jpg', ft1)
+                        cv2.imwrite('segmented.jpg', bw) 
+                    if choice3=="Color":
+                        color='function'
+                    if choice3=="Texture":
+                        texture='function'
+                    if choice3=="Hybrid":
+                        hybrid='function'
+                         
+                    if choice4=="K-Nearest Neighbors":
+                        st.success("The Skin Cancer Type is= ")
+                    if choice4=="Liner SVM":
+                        st.success("The Skin Cancer Type is= ")
+                    if choice4=="Decision Tree":
+                        st.success("The Skin Cancer Type is= ")
+                    if choice4=="Random Forest":
+                        st.success("The Skin Cancer Type is= ")
+                    if choice4=="Naive Bayes":
+                        st.success("The Skin Cancer Type is= ")
+                    if choice4=="ExtraTreesClassifier":
+                        st.success("The Skin Cancer Type is= ")
+                    imageft=Image.open("filter.jpg")
+                    imagesg=Image.open("segmented.jpg")
+                    st.text("Original                  Filter                    Segmented")                   
+                    st.image([image.resize((200, 200)),np.ones([200,20]),imageft.resize((200, 200)),np.ones([200,20]),imagesg.resize((200, 200))])
+                    
             else:
-                st.warning("Incorrect Email/Password")       
+                st.warning("Incorrect Email/Password")  
         else:
             st.warning("Not Valid Email")
 
