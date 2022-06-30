@@ -1,6 +1,6 @@
 numpy
 pillow
 scikit-learn
-opencv-contrib-python
+opencv-python==4.2.0.34
 scipy
 streamlit
