@@ -3,3 +3,4 @@ pillow
 scikit-learn
 scipy
 streamlit
+opencv-contrib-python-headless
