@@ -4,3 +4,4 @@ scikit-learn
 scipy
 streamlit
 opencv-contrib-python-headless
+scikit-image
