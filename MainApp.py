@@ -4,7 +4,10 @@ import hashlib
 import re
 import cv2
 import numpy as np
-
+from scipy.stats import skew, moment
+from skimage.feature import greycomatrix, greycoprops
+import pickle
+import bz2
 def make_hashes(password):   
     return hashlib.sha256(str.encode(password)).hexdigest()
 
@@ -28,6 +31,29 @@ def login_user(Email,password):
     c.execute('SELECT * FROM userstable WHERE Email =? AND password = ?',(Email,password))
     data = c.fetchall()
     return data
+def color(img):
+    Mean=np.mean(img)
+    Var=np.var(img)
+    b,g,r=cv2.split(img)
+    rskew=np.mean(skew(r))
+    gskew=np.mean(skew(g))
+    bskew=np.mean(skew(b))
+    rmoment=np.mean(moment(r,moment=3))
+    gmoment=np.mean(moment(g,moment=3))
+    bmoment=np.mean(moment(b,moment=3))
+    feature=[Mean,Var,rskew,gskew,bskew,rmoment,gmoment,bmoment]                    
+    return feature
+def texture(img):
+    gray=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    glcm = greycomatrix(gray, [5], [0], 256, symmetric=True, normed=True)
+    cont = greycoprops(glcm, 'contrast')[0][0]
+    corr = greycoprops(glcm, 'correlation')[0][0]
+    homo = greycoprops(glcm, 'homogeneity')[0][0]
+    eng = greycoprops(glcm, 'energy')[0][0]
+    feature=[cont,corr,homo,eng]
+    return feature
+
+
 
 # title
 image=Image.open('Home.png')
@@ -88,29 +114,36 @@ if choice1=="Login":
                             cv2.imwrite('filter.jpg', ft1)
                             cv2.imwrite('segmented.jpg', bw) 
                         if choice3=="Color":
-                            color='function'
+                            feature=color(img)
+                            sfile = bz2.BZ2File("ModelC", 'r')
+                            model=pickle.load(sfile) 
                         if choice3=="Texture":
-                            texture='function'
+                            feature=texture(img)
+                            sfile = bz2.BZ2File("ModelT", 'r')
+                            model=pickle.load(sfile) 
                         if choice3=="Hybrid":
-                            hybrid='function'
-                             
+                            frcolor=color(img)
+                            frtexture=texture(img)
+                            feature=np.concatenate((frcolor,frtexture))
+                            sfile = bz2.BZ2File("ModelH", 'r')
+                            model=pickle.load(sfile) 
                         if choice4=="K-Nearest Neighbors":
-                            st.success("The Skin Cancer Type is= ")
+                            st.success("The Skin Cancer Type is= "+model[0].predict([feature])[0])
                         if choice4=="Liner SVM":
-                            st.success("The Skin Cancer Type is= ")
+                            st.success("The Skin Cancer Type is= "+model[1].predict([feature])[0])
                         if choice4=="Decision Tree":
-                            st.success("The Skin Cancer Type is= ")
+                            st.success("Remain") #The Skin Cancer Type is= "+model[2].predict([feature])[0])
                         if choice4=="Random Forest":
-                            st.success("The Skin Cancer Type is= ")
+                            st.success("Remain") #The Skin Cancer Type is= "+model[3].predict([feature])[0])
                         if choice4=="Naive Bayes":
-                            st.success("The Skin Cancer Type is= ")
+                            st.success("Remain") #The Skin Cancer Type is= "+model[4].predict([feature])[0])
                         if choice4=="ExtraTreesClassifier":
-                            st.success("The Skin Cancer Type is= ")
+                            st.success("Remain") #The Skin Cancer Type is= "+model[5].predict([feature])[0])
                         imageft=Image.open("filter.jpg")
                         imagesg=Image.open("segmented.jpg")
                         st.text("Original                  Filter                    Segmented")                   
                         st.image([image.resize((200, 200)),np.ones([200,20]),imageft.resize((200, 200)),np.ones([200,20]),imagesg.resize((200, 200))])
-                    
+                        
             else:
                 st.warning("Incorrect Email/Password")  
         else:
